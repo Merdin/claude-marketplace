@@ -1,0 +1,13 @@
+{
+  "name": "merdin",
+  "description": "Skills for creating requirement specifications.",
+  "owner": {
+    "name": "Merdin"
+  },
+  "plugins": [
+    {
+      "name": "specs",
+      "source": "./plugins/specs"
+    }
+  ]
+}
