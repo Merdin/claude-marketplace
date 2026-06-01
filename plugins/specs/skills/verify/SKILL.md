@@ -6,7 +6,7 @@ Je bent een requirements-analist die controleert of een geïmplementeerde featur
 
 Werk altijd in het Nederlands, ongeacht de taal waarin de gebruiker schrijft. Stel altijd exact één vraag tegelijk.
 
-**Belangrijk:** Deze skill past nooit broncode aan. Je leest de code-wijzigingen alleen om te verifiëren; je wijzigt uitsluitend bestanden in de `specs/`-map.
+**Belangrijk:** Deze skill past nooit broncode aan. Je leest de code-wijzigingen alleen om te verifiëren; je wijzigt uitsluitend bestanden in de `docs/specs/`-map.
 
 ---
 
@@ -43,37 +43,37 @@ Werk altijd in het Nederlands, ongeacht de taal waarin de gebruiker schrijft. St
 
 ## Stap 2 — Specs-structuur controleren
 
-Controleer of er specs zijn om tegen te verifiëren. Lees de mappen `specs/features/`, `specs/bugs/` en `specs/improvements/`.
+Controleer of er specs zijn om tegen te verifiëren. Lees de mappen `docs/specs/<domein>/` (per-story bestanden), `docs/specs/bugs/` en `docs/specs/improvements/`.
 
 - **Alle drie ontbreken of zijn leeg** → stop en meld:
 
-  > "Er zijn geen feature-, bug- of improvement-specs gevonden in `specs/`. Draai eerst `/specs:intake` om de verwachte werking vast te leggen, en kom daarna terug."
+  > "Er zijn geen feature-, bug- of improvement-specs gevonden in `docs/specs/`. Draai eerst `/specs:intake` om de verwachte werking vast te leggen, en kom daarna terug."
 
 ---
 
 ## Stap 3 — De juiste spec bepalen
 
-Lees alle bestanden in `specs/features/`, `specs/bugs/` en `specs/improvements/`. Bepaal welke spec hoort bij de huidige wijziging door te scoren op:
+Lees alle bestanden in `docs/specs/<domein>/`, `docs/specs/bugs/` en `docs/specs/improvements/`. Bepaal welke spec hoort bij de huidige wijziging door te scoren op:
 
 - **Branchnaam** — overeenkomst tussen `git branch --show-current` en de bestandsnaam/titel van de spec.
 - **Geraakte bestanden** — overlap tussen de gewijzigde bestanden uit de diff en de `Relevante bestanden`-sectie van de spec.
 - **Commit-boodschappen** — trefwoorden uit `git log origin/development..HEAD` die matchen met de titel/beschrijving van de spec.
-- **Getroffen use cases** — of de bestanden die in de spec onder `Getroffen use cases` staan, ook in de diff voorkomen.
+- **Referenties** — of het story-pad en de gemarkeerde items die in een bug-/improvement-bestand onder `Referenties` staan, raken aan de gewijzigde bestanden uit de diff.
 
 Daarna:
 
 - **Eén duidelijke kandidaat** → presenteer en vraag bevestiging:
 
-  > "Op basis van je branch en wijzigingen ga ik ervan uit dat je werkt aan de [feature/bug/improvement]: `specs/<map>/<naam>.md` — *[titel]*. Klopt dat?"
+  > "Op basis van je branch en wijzigingen ga ik ervan uit dat je werkt aan de [feature/bug/improvement]: `docs/specs/<pad>/<naam>.md` — *[titel]*. Klopt dat?"
 
   - "nee" → toon de volledige lijst (zie hieronder) en laat de gebruiker kiezen.
 
 - **Meerdere plausibele kandidaten** → presenteer als genummerde lijst en laat de gebruiker verifiëren:
 
   > "Er zijn meerdere specs die bij deze wijziging kunnen horen. Welke verifiëren we?
-  > 1. `specs/features/<naam>.md` — *[titel]*
-  > 2. `specs/bugs/<naam>.md` — *[titel]*
-  > 3. `specs/improvements/<naam>.md` — *[titel]*"
+  > 1. `docs/specs/<domein>/<story>.md` — *[titel]*
+  > 2. `docs/specs/bugs/<naam>.md` — *[titel]*
+  > 3. `docs/specs/improvements/<naam>.md` — *[titel]*"
 
 - **Geen enkele match** → vraag de gebruiker het pad of de naam van de spec op te geven.
 
@@ -86,16 +86,16 @@ Onthoud of het een **feature**, een **bug** of een **improvement** is — dat be
 Lees de gekozen spec en haal eruit:
 
 - **Bij een feature:**
-  - De `Stories`-sectie → alle Scenarios (GIVEN/WHEN/THEN) per Narrative. Dit is je verificatie-checklist.
-  - De `Use Cases` (Primary course + error courses) → het verwachte verloop en de foutafhandeling, als aanvullende checks.
-  - Bij een feature is de spec zelf het te verifiëren doel; er is doorgaans geen aparte `Getroffen use cases`-lijst. De use cases die je in Stap 7 mogelijk bijwerkt, staan in dit feature-bestand zelf.
+  - De `Stories`-sectie → alle Scenarios (GEGEVEN/WANNEER/DAN) per Narrative. Dit is je verificatie-checklist.
+  - De `Use cases` (Primary course + other/error courses) → het verwachte verloop en de foutafhandeling, als aanvullende checks.
+  - Bij een feature is de spec zelf het te verifiëren doel; er zijn geen overlays of `Referenties` zoals bij bug/improvement. De use cases die je in Stap 7 mogelijk bijwerkt, staan in dit story-bestand zelf.
 - **Bij een bug:**
-  - `Huidige situatie (reproductie)` → het foutieve gedrag (GIVEN/WHEN/THEN).
-  - `Verwachte situatie (acceptatie criteria)` → de scenario's die ná de fix moeten kloppen. Dit is je verificatie-checklist.
+  - Lees de `Referenties`-sectie van het bug-bestand → het story-pad en de gemarkeerde items.
+  - Open de story en lees per gemarkeerd item de **bug-overlay** (`> ⚠️ **Bug `<bug-slug>`**`): het **Huidig (foutief) gedrag** en de **Verwacht (na fix)**-situatie. De "Verwacht (na fix)"-scenario's zijn je verificatie-checklist.
 - **Bij een improvement:**
-  - `Huidige situatie` → het oude gedrag.
-  - `Verbetering` + de scenario-blokken → de gewenste nieuwe werking. Dit is je verificatie-checklist.
-- **Bij bug en improvement:** de `Getroffen use cases`-lijst (bestandspad → naam use case). Bewaar deze voor Stap 7.
+  - Lees de `Referenties`-sectie van het improvement-bestand → het story-pad en de gemarkeerde items.
+  - Open de story en lees per gemarkeerd item de **improvement-overlay** (`> ✏️ **Improvement `<imp-slug>`**`): de **Huidige werking** en de **Gewenste verbetering**. De "Gewenste verbetering"-scenario's zijn je verificatie-checklist.
+- **Bij bug en improvement:** bewaar de `<bug-slug>`/`<imp-slug>`, het story-pad en de lijst gemarkeerde items voor Stap 7.
 
 ---
 
@@ -164,50 +164,98 @@ Werk alleen de use cases bij; pas geen broncode aan.
 - Tak A → de verwachte scenario's uit de spec.
 - Tak B (nieuwe logica klopt) → de werkelijk geïmplementeerde logica.
 
-**Bepaal de getroffen use cases:**
+**Bepaal de te verwerken items:**
 
-- **Bij een feature:** de use cases staan in het feature-bestand zelf (de gekozen spec). Werk de Stories (narratives + scenario's) en Use Cases in dát bestand bij. Vul eventueel aan met andere feature-bestanden waarvan de `Relevante bestanden` overlappen met de gewijzigde bestanden uit de diff.
-- **Bij een bug of improvement:** begin met de `Getroffen use cases`-lijst uit de spec (Stap 4). Vul aan met use cases in `specs/features/` waarvan de `Relevante bestanden` overlappen met de gewijzigde bestanden uit de diff. Ontbreekt de lijst, zoek dan in `specs/features/` naar use cases die de gewijzigde bestanden of het beschreven gedrag raken.
+- **Bij een feature:** de use cases staan in het story-bestand zelf (de gekozen spec). Werk de Narratives (narratives + scenario's) en Use cases in dát bestand bij. Vul eventueel aan met andere story-bestanden waarvan de `Relevante bestanden` overlappen met de gewijzigde bestanden uit de diff.
+- **Bij een bug of improvement:** de te verwerken items zijn de **gemarkeerde items in de story** (de overlays die je in Stap 4 via de `Referenties` hebt gevonden). Elk item heeft een overlay met de doel-werking ("Verwacht (na fix)" resp. "Gewenste verbetering").
 
-**Werk elke use case afzonderlijk bij, één voor één:**
+**Werk elk item afzonderlijk bij, één voor één:**
 
-1. Open het feature-bestand en lokaliseer de use case met de bijbehorende narrative(s) en scenario's.
-2. **Toon de huidige inhoud** (citeer de relevante narrative/scenario's letterlijk).
-3. **Stel de concrete wijziging voor** om de use case in lijn te brengen met het doelgedrag, volgens de narrative- en scenario-schrijfregels hieronder. Benoem expliciet:
-   - welke scenario's worden toegevoegd of aangepast;
-   - welke scenario's of annotaties verouderd raken en (daarna) verwijderd worden.
-4. **Vraag goedkeuring voor déze use case:**
+1. Open het story-bestand en lokaliseer het item met de bijbehorende narrative(s)/scenario's en — bij bug/improvement — de overlay.
+2. **Toon de huidige inhoud** (citeer de relevante narrative/scenario's en de overlay letterlijk).
+3. **Stel de concrete wijziging voor** om het item in lijn te brengen met het doelgedrag, volgens de narrative- en scenario-schrijfregels hieronder. Benoem expliciet welke scenario's worden toegevoegd/aangepast en welke (overlay/scenario's) daarna verwijderd worden.
+4. **Vraag goedkeuring voor dít item:**
 
-   > "Zal ik deze use case zo bijwerken?"
+   > "Zal ik dit item zo bijwerken en de markering opruimen?"
 
 5. **Na goedkeuring — pas toe in deze volgorde (verplicht):**
-   1. **Eerst** de bestaande scenario's aanpassen of de nieuwe scenario's toevoegen die het geverifieerde doelgedrag beschrijven.
-   2. **Daarna pas** verouderde scenario's en niet langer kloppende annotaties verwijderen.
+   1. **Eerst** de bestaande scenario's aanpassen of vervangen door het geverifieerde doelgedrag.
+   2. **Daarna pas** de overlay (en eventuele verouderde scenario's) verwijderen.
 
    Aanvullend per type:
-   - **Feature** → werk de scenario's en use cases in het feature-bestand zelf bij zodat ze de geverifieerde werking beschrijven. Bij Tak A (implementatie klopt met de spec) is er meestal niets aan te passen; alleen bij Tak B (de code wijkt bewust af) breng je de scenario's in lijn met de werkelijk geïmplementeerde logica. Features hebben geen `⚠️ Afwijking`- of `ℹ️ Aangepast via`-annotaties.
-   - **Bug (opgelost)** → de use case beschrijft nu weer kloppend gedrag. Verwijder de eerder toegevoegde annotatie `> ⚠️ Afwijking: zie [...]` zodra de scenario's kloppen.
-   - **Improvement** → zorg dat de scenario's de nieuwe werking beschrijven; vervang of verwijder scenario's die het oude gedrag beschrijven. Werk de annotatie `> ℹ️ Aangepast via [...]` bij of laat hem staan.
-6. Bevestig dat het bestand is bijgewerkt en ga door naar de volgende use case.
+   - **Feature** → werk de scenario's en use cases in het story-bestand zelf bij. Bij Tak A (implementatie klopt met de spec) is er meestal niets aan te passen; alleen bij Tak B (de code wijkt bewust af) breng je de scenario's in lijn met de werkelijk geïmplementeerde logica. Features hebben geen overlay.
+   - **Bug (opgelost)** → vervang de scenario('s) van het item door de **Verwacht (na fix)**-werking uit de overlay (Tak A) of door de werkelijk geïmplementeerde logica (Tak B). Verwijder daarna de bug-overlay (`> ⚠️ **Bug `<bug-slug>`**`) bij dit item.
+   - **Improvement (doorgevoerd)** → vervang de scenario('s) van het item door de **Gewenste verbetering** uit de overlay (Tak A) of door de werkelijk geïmplementeerde logica (Tak B). Verwijder daarna de improvement-overlay (`> ✏️ **Improvement `<imp-slug>`**`) bij dit item.
+6. Bevestig dat het item is bijgewerkt en ga door naar het volgende.
 
-**Tot slot (alleen Tak B, nieuwe logica klopt):** bied aan om in de feature/bug/improvement-spec zelf de acceptatie-scenario's in lijn te brengen met de nieuwe logica, en vink bij bug/improvement-specs de scenario's af (`- [x]`) die nu zijn gerealiseerd.
+**Opruimen na alle items (alleen bug/improvement):** zodra alle gemarkeerde items van deze `<bug-slug>`/`<imp-slug>` zijn verwerkt, stel de laatste opschoning voor en vraag goedkeuring:
+
+> "Alle gemarkeerde items zijn bijgewerkt. Ik verwijder nu de bannerregel voor `<slug>` onder de H1 van de story en ruim het [bug/improvement]-bestand `docs/specs/<map>/<slug>.md` op. Akkoord?"
+
+- "ja" →
+  1. Verwijder de bannerregel voor deze slug onder de H1 (en de hele banner als er geen open bugs/improvements meer in de story staan).
+  2. Verwijder het bug-/improvement-bestand `docs/specs/bugs|improvements/<slug>.md`.
+
+  Resultaat: de story bevat alleen nog de actuele, geverifieerde documentatie — overlays, banner en losse issue-bestand zijn opgeruimd.
+- "nee" → laat de banner en het bestand staan en benoem dit in het eindoverzicht.
 
 ---
 
-## Narrative- en scenario-schrijfregels (altijd toepassen bij het bewerken)
+## Terminologie & vertalingen (altijd toepassen bij het bewerken)
+
+De codebase is doorgaans Engelstalig (modelnamen, attributen, enums, labels in code), maar de specs schrijf je in het Nederlands. Verzin nooit een eigen, letterlijke woord-voor-woord-vertaling van een Engelse term — gebruik de Nederlandse term die het project zélf aan gebruikers toont.
+
+**Zoek daarom naar de vertaalbestanden (i18n) in de codebase** en bouw daaruit een kleine woordenlijst: Engelse code-term/sleutel → Nederlandse projectterm. Veelvoorkomende locaties per framework:
+
+- **Laravel** → `lang/`, `resources/lang/` (`nl.json`, `lang/nl/*.php`)
+- **Rails** → `config/locales/*.yml` (bijv. `nl.yml`)
+- **Django** → `locale/nl/LC_MESSAGES/django.po`
+- **Symfony** → `translations/*.nl.yml`
+- **JS/Vue/React/Next (i18n)** → `locales/`, `i18n/`, `messages/nl.json`, `public/locales/nl/`
+
+Regels:
+
+- Komt een term voor in de vertaalbestanden → gebruik exact díe Nederlandse term in de functionele prozatekst (story-titel, narratives, scenario's en use-case-stappen).
+- Komt een term er niet in voor → kies een natuurlijke, gangbare Nederlandse term. Gebruik nooit een houtige, letterlijke vertaling die in het Nederlands vreemd klinkt; bij twijfel behoud je de oorspronkelijke term.
+- **Technische aanduidingen blijven in code-vorm** en vertaal je niet: modelnamen, attributen, enum-waarden en veldnamen in `Use cases` (Data), `Model Specs`, `Formuliervelden` (kolom Veld) en payload contracts schrijf je altijd in de oorspronkelijke code-notatie.
+- Zijn er geen vertaalbestanden in het project → schrijf gewone, natuurlijke Nederlandse termen en vermijd geforceerde vertalingen.
+
+---
+
+## Narrative-, scenario- en use-case-schrijfregels (altijd toepassen bij het bewerken)
 
 **Narratives:**
 
 - Eén actie én één object per narrative. Combineer nooit meerdere acties of objecten in één "Wil ik"-zin met "en", "of" of een opsomming.
 - Fout: "Wil ik projecten aanmaken en beheren" → Correct: drie losse narratives voor aanmaken, bewerken en verwijderen.
-- Meerdere narratives binnen hetzelfde domeinbestand zijn de norm, niet de uitzondering.
+- Eén story-bestand kan meerdere narratives bevatten als ze tot dezelfde story horen; splits losse acties of objecten op in afzonderlijke stories (eigen bestanden).
+- **Eén story = één specifieke actie.** Een story beschrijft altijd precies één actie op één object. "Een contactpersoon bewerken of verwijderen" zijn twee stories (bewerken én verwijderen), elk in een eigen bestand — combineer nooit twee acties in één story (ook niet in de `Story:`-regel).
+- **Actor bij permissie-gestuurde acties:** als een actie door elke gebruiker met een bepaalde permissie kan worden uitgevoerd (de specifieke rol doet er niet toe), is de actor altijd `gebruiker`. Schrijf `Als gebruiker met de permissie '<permissie>'` — de permissie is voldoende, de rol is irrelevant.
+  - Fout: "Als Admin of Binnendienstmedewerker met de permissie 'update contacts'" → Correct: "Als gebruiker met de permissie 'update contacts'".
+- **Eén actor per narrative:** als er wél meerdere specifieke actoren relevant zijn (en het niet enkel om een permissie gaat), maak dan per actor een aparte narrative. Gebruik nooit "of" tussen actoren in de "Als"-regel, anders wordt de actorlijst een lange opsomming.
+  - Fout: één narrative "Als Admin of Binnendienstmedewerker ...". → Correct: twee narratives, één "Als Admin ..." en één "Als Binnendienstmedewerker ...".
 
 **Scenarios:**
 
+- Schrijf de scenario's met de Nederlandse sleutelwoorden `Gegeven`, `Wanneer`, `Dan` en `En`. Gebruik nooit de Engelse `Given`/`When`/`Then`/`And`.
 - Eén scenario per situatie. Als iets op meerdere plekken getoond of gebruikt wordt (bijv. planning, PDF, e-mail, tabellen), krijgt elke plek een eigen scenario.
-- Geen "of" in GIVEN, WHEN of THEN. Als WHEN twee triggers bevat, of THEN twee uitkomsten, krijgt elke variant zijn eigen GIVEN-WHEN-THEN blok.
+- Geen "of" in GEGEVEN, WANNEER of DAN. Als WANNEER twee triggers bevat, of DAN twee uitkomsten, krijgt elke variant zijn eigen GEGEVEN-WANNEER-DAN blok.
 - Geen implementatiedetails in scenarios. Beschrijf WAT er nodig is, niet HOE het werkt. Laat technische details zoals "zonder scheidingsteken", "via REST-call" of "met debounce" weg.
+- **Geen technische aanduidingen of low-level details in scenarios.** Noem geen klasse-, component- of actienamen uit de code (bijv. `MaterialsRelationManager`, `AttachAction`), geen UI-positie (waar een knop of tab staat) en geen herkomst van functionaliteit (bijv. "aangeboden door stechstudio/filament-impersonate"). Beschrijf het gedrag puur functioneel. Neem zo'n detail alléén op als de klant er expliciet om vraagt.
 - Wees zo generiek mogelijk waar mogelijk, maar specifiek als de context het vereist.
+
+**Use cases:**
+
+- **Een use case is een high-level beschrijving van het systeemgedrag, geen implementatie.** Beschrijf in de stappen WAT er functioneel gebeurt vanuit het perspectief van de gebruiker of het systeem — nooit HOE het technisch werkt. Noem geen methode- of functienamen, klassenamen, interne berekeningen, queries of synchronisatieprocessen.
+  - Fout: "`Bon::calculateTotal()` wordt aangeroepen" en "Bij toekomstige `syncAssignmentHours()` wordt het soft-deleted item herkend en overgeslagen".
+  - Correct: "Het totaal van de bon wordt opnieuw berekend." De interne sync-stap laat je weg — dat is een implementatiedetail dat niet in de use case thuishoort.
+- **Eén use case = één samenhangende interactie.** De `Primary course` beschrijft precies één doorlopend happy path. Verwerk nooit een losse, op zichzelf staande interactie als stap in de primary course van een andere use case — splits die af naar een eigen use case.
+- **Een `other course` is een afwijkend, niet-foutief verloop bínnen dezelfde interactie — geen losse actie.** Een other course vertakt vanuit een stap in de primary course: het lopende proces wordt afgebroken (bijv. de gebruiker annuleert het opslaan) of neemt een afwijkende, geldige route die tot een ander resultaat leidt. Een op zichzelf staande actie die volledig los van de primary course wordt uitgevoerd is géén other course, maar een eigen use case. Schrijf elke other course als eigen blok met de heading `<omschrijving van het verloop> (other course)`, parallel aan de error-course-heading.
+  - Fout: bij "Bon uitstellen" een other course "Uitstellen ongedaan maken" met stappen "Gebruiker wist de datum en slaat op". → Dit is een zelfstandige actie die losstaat van het uitstellen, dus een eigen use case.
+  - Correct: other course `Opslaan annuleren (other course)` — de gebruiker breekt het invullen van de uitsteldatum af, waarna de bon ongewijzigd blijft.
+- **Zoeken, sorteren, filteren en pagineren zijn elk een eigen use case**, geen stap in de "overzicht bekijken"-use case. Een overzicht-use case beschrijft alleen het laden en tonen van de lijst (kolommen, sortering bij het laden, beschikbare rij-acties). Elke aanvullende interactie op die lijst krijgt een eigen use case met een eigen `Data`-sectie (alleen de velden die voor díe interactie relevant zijn).
+  - Fout: use case "Contactpersonen overzicht bekijken" met primary-course-stappen "Gebruiker kan zoeken op naam en e-mailadres" en "Gebruiker kan sorteren op naam".
+  - Correct: drie use cases — "Contactpersonen overzicht bekijken" (laden + tonen), "Contactpersonen zoeken" (Data: `naam`, `email`) en "Contactpersonen sorteren" (Data: `naam`).
 
 ---
 
@@ -218,13 +266,17 @@ Geef een beknopt overzicht:
 ```
 Verificatie voltooid.
 
-Spec:      specs/<map>/<naam>.md — <titel>
+Spec:      docs/specs/<pad>/<naam>.md — <titel>
 Vergeleken met: origin/development (base <korte-hash>)
 Oordeel:   <Voldoet aan verwachting | Wijkt af — nieuwe logica bevestigd | Wijkt af — code nog niet klaar>
 
 Bijgewerkte use cases:
-  - specs/features/<naam>.md → <use case>  (toegevoegd: <n>, verwijderd: <n>)
+  - docs/specs/<domein>/<story>.md → <use case>  (toegevoegd: <n>, verwijderd: <n>)
   - ...
+
+Opgeruimd (alleen bug/improvement):
+  - overlay(s) + banner `<slug>` verwijderd uit docs/specs/<domein>/<story>.md
+  - docs/specs/<map>/<slug>.md verwijderd
 
 Niet gewijzigd:
   - <bestand/use case>: <reden>

@@ -31,33 +31,35 @@ Het type bepaalt alleen welke template aan het einde wordt gebruikt. De vragen z
 
 ## Project specs-structuur
 
-De specs en actoren worden opgeslagen in een `specs/` map in de **huidige werkdirectory van het project**. De structuur is:
+De specs en actoren worden opgeslagen in een `docs/specs/` map in de **huidige werkdirectory van het project**. De structuur is:
 
 ```
-specs/
+docs/specs/
   actors.md
-  features/
-    <english-domain-name>.md
+  <english-domain-name>/
+    <english-story-name>.md
   bugs/
     <bug-naam>.md
   improvements/
     <improvement-naam>.md
 ```
 
-### Domeinbestanden
+### Story-bestanden
 
-Feature-bestanden beschrijven een **domein of module**, niet een losse actie. De bestandsnaam is altijd Engelstalig en kebab-case:
+Het **domein** is een **map** (`docs/specs/<domein>/`); elke **story** is een **eigen bestand** in die map. Een story is één cohesief stukje functionaliteit (doorgaans één hoofdactie op één object). Map- en bestandsnaam zijn altijd Engelstalig en kebab-case:
 
-- Alle use cases voor aanmaken, bewerken, verwijderen en inspecteren van een gebruiker → `specs/features/user-management.md`
-- Alles rondom afbeeldingen tonen, uploaden, verwijderen → `specs/features/image-feed.md`
-- Bestellingen aanmaken en beheren → `specs/features/order-management.md`
+- Aanmaken van een gebruiker → `docs/specs/user-management/create-user.md`
+- Een afbeelding uploaden → `docs/specs/image-feed/upload-image.md`
+- Een bestelling annuleren → `docs/specs/order-management/cancel-order.md`
 
-Elke feature-file begint met een H1-kop:
+Een story-bestand is zelfstandig: het bevat de volledige template (Story + Narratives + Scenarios + Use cases + Model Specs) voor díe ene story.
+
+Elk story-bestand begint met een H1-kop met de titel van de story:
 ```markdown
-# <Domain Name> Feature Specs
+# <Story Titel>
 ```
 
-**Als er al een domeinbestand bestaat voor hetzelfde functiegebied**, voeg de nieuwe content toe aan dat bestaande bestand — maak geen nieuw bestand aan.
+**Als er al een bestand bestaat voor dezelfde story**, voeg de nieuwe content toe aan dat bestaande bestand — maak geen nieuw bestand aan.
 
 ### Opstarten: controleer de actieve git branch
 
@@ -94,20 +96,41 @@ Controleer als allereerste stap of de huidige werkdirectory een codebase bevat. 
 
 ### Opstarten: controleer de specs-structuur
 
-Lees daarna het bestand `specs/actors.md` in de huidige werkdirectory.
+Lees daarna het bestand `docs/specs/actors.md` in de huidige werkdirectory.
 
 - **Bestaat en bevat actoren** → sla op voor gebruik bij de actorenvraag later
-- **Bestaat maar is leeg** → vraag: "Het bestand `specs/actors.md` is leeg. Wil je actoren toevoegen?" → zo ja: vraag namen en sla op
-- **Bestaat niet** → vraag: "Er is nog geen `specs/` structuur. Wil je deze aanmaken?" → zo ja: maak mappen en `specs/actors.md` aan en vraag welke actoren toegevoegd moeten worden → zo nee: ga verder zonder actorlijst
+- **Bestaat maar is leeg** → vraag: "Het bestand `docs/specs/actors.md` is leeg. Wil je actoren toevoegen?" → zo ja: vraag namen en sla op
+- **Bestaat niet** → vraag: "Er is nog geen `docs/specs/` structuur. Wil je deze aanmaken?" → zo ja: maak mappen en `docs/specs/actors.md` aan en vraag welke actoren toegevoegd moeten worden → zo nee: ga verder zonder actorlijst
 
-Formaat van `specs/actors.md`:
+Formaat van `docs/specs/actors.md`:
 ```markdown
 # Actoren
 
 - <actornaam>
 ```
 
-Nieuwe actor toevoegen tijdens het gesprek: vraag de naam, voeg toe aan `specs/actors.md`, gebruik verder in het gesprek.
+Nieuwe actor toevoegen tijdens het gesprek: vraag de naam, voeg toe aan `docs/specs/actors.md`, gebruik verder in het gesprek.
+
+---
+
+## Terminologie & vertalingen (altijd toepassen)
+
+De codebase is doorgaans Engelstalig (modelnamen, attributen, enums, labels in code), maar de specs schrijf je in het Nederlands. Verzin nooit een eigen, letterlijke woord-voor-woord-vertaling van een Engelse term — gebruik de Nederlandse term die het project zélf aan gebruikers toont.
+
+**Zoek daarom (tijdens de codebase-analyse) naar de vertaalbestanden (i18n) in de codebase** en bouw daaruit een kleine woordenlijst: Engelse code-term/sleutel → Nederlandse projectterm. Veelvoorkomende locaties per framework:
+
+- **Laravel** → `lang/`, `resources/lang/` (`nl.json`, `lang/nl/*.php`)
+- **Rails** → `config/locales/*.yml` (bijv. `nl.yml`)
+- **Django** → `locale/nl/LC_MESSAGES/django.po`
+- **Symfony** → `translations/*.nl.yml`
+- **JS/Vue/React/Next (i18n)** → `locales/`, `i18n/`, `messages/nl.json`, `public/locales/nl/`
+
+Regels:
+
+- Komt een term voor in de vertaalbestanden → gebruik exact díe Nederlandse term in de functionele prozatekst (story-titel, narratives, scenario's en use-case-stappen) en in je vragen aan de gebruiker.
+- Komt een term er niet in voor → kies een natuurlijke, gangbare Nederlandse term. Gebruik nooit een houtige, letterlijke vertaling die in het Nederlands vreemd klinkt; bij twijfel behoud je de oorspronkelijke term.
+- **Technische aanduidingen blijven in code-vorm** en vertaal je niet: modelnamen, attributen, enum-waarden en veldnamen in `Use cases` (Data), `Model Specs`, `Formuliervelden` (kolom Veld) en payload contracts schrijf je altijd in de oorspronkelijke code-notatie.
+- Zijn er geen vertaalbestanden in het project → schrijf gewone, natuurlijke Nederlandse termen en vermijd geforceerde vertalingen.
 
 ---
 
@@ -142,11 +165,11 @@ Als het doel niet uit de beschrijving af te leiden is, of als het doel te techni
 
 ### Stap 4 — Use case voorstel
 
-Doorzoek de codebase **voordat** je use cases opstelt. Zoek naar bestaande implementaties gerelateerd aan de beschrijving (modellen, controllers, views, routes, services, jobs, etc.) en lees de `specs/` map door op raakvlakken. Gebruik deze kennis om de use cases beter te onderbouwen en dubbel werk te voorkomen.
+Doorzoek de codebase **voordat** je use cases opstelt. Zoek naar bestaande implementaties gerelateerd aan de beschrijving (modellen, controllers, views, routes, services, jobs, etc.) en lees de `docs/specs/` map door op raakvlakken. Lokaliseer hierbij ook de **vertaalbestanden (i18n)** voor de juiste Nederlandse terminologie (zie "Terminologie & vertalingen"). Gebruik deze kennis om de use cases beter te onderbouwen en dubbel werk te voorkomen.
 
 **Verouderde specs verzamelen (stil, geen vragen):** Vergelijk de bestaande spec-bestanden in het raakvlak met wat je in de codebase aantreft. Noteer intern elke afwijking die je vindt — beschrijvingen, stappen, velden of scenario's die niet meer overeenkomen met de huidige implementatie. Stel hier geen vragen over; bewaar deze lijst voor het einde van het proces.
 
-**Getroffen use cases verzamelen (stil, alleen bij bug of improvement):** Doorzoek de `specs/features/` bestanden naar use cases die direct betrekking hebben op de beschreven situatie. Noteer intern per treffer: het bestandspad en de naam van de use case. Stel hier geen vragen over; bewaar deze lijst voor Stap 8.
+**Getroffen use cases verzamelen (stil, alleen bij bug of improvement):** Doorzoek de story-bestanden in `docs/specs/<domein>/` naar use cases die direct betrekking hebben op de beschreven situatie. Noteer intern per treffer: het bestandspad en de naam van de use case. Stel hier geen vragen over; bewaar deze lijst voor Stap 8.
 
 Genereer daarna op basis van de beschrijving, het doel en de codebase-kennis een lijst van use cases — korte titels met maximaal één zin beschrijving. Denk ook aan randgevallen en alternatieve scenario's. Presenteer als genummerde lijst en vraag:
 
@@ -154,21 +177,41 @@ Genereer daarna op basis van de beschrijving, het doel en de codebase-kennis een
 
 Pas de lijst aan op basis van het antwoord.
 
-**Narrative- en scenario-schrijfregels (altijd toepassen):**
+**Narrative-, scenario- en use-case-schrijfregels (altijd toepassen):**
 
 Narratives:
 
 - Eén actie én één object per narrative. Combineer nooit meerdere acties of objecten in één "Wil ik"-zin met "en", "of" of een opsomming.
 - Fout: "Wil ik projecten aanmaken en beheren" → Correct: drie losse narratives voor aanmaken, bewerken en verwijderen.
 - Fout: "Wil ik projecten koppelen aan relaties en contactpersonen" → Correct: twee losse narratives, één voor relaties en één voor contactpersonen.
-- Meerdere narratives binnen hetzelfde domeinbestand zijn de norm, niet de uitzondering.
+- Eén story-bestand kan meerdere narratives bevatten als ze tot dezelfde story horen; splits losse acties of objecten op in afzonderlijke stories (eigen bestanden).
+- **Eén story = één specifieke actie.** Een story beschrijft altijd precies één actie op één object. "Een contactpersoon bewerken of verwijderen" zijn twee stories (bewerken én verwijderen), elk in een eigen bestand — combineer nooit twee acties in één story (ook niet in de `Story:`-regel).
+- **Actor bij permissie-gestuurde acties:** als een actie door elke gebruiker met een bepaalde permissie kan worden uitgevoerd (de specifieke rol doet er niet toe), is de actor altijd `gebruiker`. Schrijf `Als gebruiker met de permissie '<permissie>'` — de permissie is voldoende, de rol is irrelevant.
+  - Fout: "Als Admin of Binnendienstmedewerker met de permissie 'update contacts'" → Correct: "Als gebruiker met de permissie 'update contacts'".
+- **Eén actor per narrative:** als er wél meerdere specifieke actoren relevant zijn (en het niet enkel om een permissie gaat), maak dan per actor een aparte narrative. Gebruik nooit "of" tussen actoren in de "Als"-regel, anders wordt de actorlijst een lange opsomming.
+  - Fout: één narrative "Als Admin of Binnendienstmedewerker ...". → Correct: twee narratives, één "Als Admin ..." en één "Als Binnendienstmedewerker ...".
 
 Scenarios:
 
+- Schrijf de scenario's met de Nederlandse sleutelwoorden `Gegeven`, `Wanneer`, `Dan` en `En`. Gebruik nooit de Engelse `Given`/`When`/`Then`/`And`.
 - Eén scenario per situatie. Als iets op meerdere plekken getoond of gebruikt wordt (bijv. planning, PDF, e-mail, tabellen), krijgt elke plek een eigen scenario — zodat er per plek een test geschreven kan worden.
-- Geen "of" in GIVEN, WHEN of THEN. Als WHEN twee triggers bevat, of THEN twee uitkomsten, krijgt elke variant zijn eigen GIVEN-WHEN-THEN blok — ook als ze onder hetzelfde scenario vallen. Eén blok = één trigger + één uitkomst.
-- Geen implementatiedetails in scenarios. Een scenario beschrijft WAT er nodig is, niet HOE het werkt. Laat technische details zoals "zonder scheidingsteken", "via REST-call" of "met debounce" weg uit GIVEN/WHEN/THEN.
+- Geen "of" in GEGEVEN, WANNEER of DAN. Als WANNEER twee triggers bevat, of DAN twee uitkomsten, krijgt elke variant zijn eigen GEGEVEN-WANNEER-DAN blok — ook als ze onder hetzelfde scenario vallen. Eén blok = één trigger + één uitkomst.
+- Geen implementatiedetails in scenarios. Een scenario beschrijft WAT er nodig is, niet HOE het werkt. Laat technische details zoals "zonder scheidingsteken", "via REST-call" of "met debounce" weg uit GEGEVEN/WANNEER/DAN.
+- **Geen technische aanduidingen of low-level details in scenarios.** Noem geen klasse-, component- of actienamen uit de code (bijv. `MaterialsRelationManager`, `AttachAction`), geen UI-positie (waar een knop of tab staat) en geen herkomst van functionaliteit (bijv. "aangeboden door stechstudio/filament-impersonate"). Beschrijf het gedrag puur functioneel. Neem zo'n detail alléén op als de klant er expliciet om vraagt.
 - Wees zo generiek mogelijk waar mogelijk, maar specifiek als de context het vereist (bijv. bij meerdere locaties).
+
+Use cases:
+
+- **Een use case is een high-level beschrijving van het systeemgedrag, geen implementatie.** Beschrijf in de stappen WAT er functioneel gebeurt vanuit het perspectief van de gebruiker of het systeem — nooit HOE het technisch werkt. Noem geen methode- of functienamen, klassenamen, interne berekeningen, queries of synchronisatieprocessen.
+  - Fout: "`Bon::calculateTotal()` wordt aangeroepen" en "Bij toekomstige `syncAssignmentHours()` wordt het soft-deleted item herkend en overgeslagen".
+  - Correct: "Het totaal van de bon wordt opnieuw berekend." De interne sync-stap laat je weg — dat is een implementatiedetail dat niet in de use case thuishoort.
+- **Eén use case = één samenhangende interactie.** De `Primary course` beschrijft precies één doorlopend happy path. Verwerk nooit een losse, op zichzelf staande interactie als stap in de primary course van een andere use case — splits die af naar een eigen use case.
+- **Een `other course` is een afwijkend, niet-foutief verloop bínnen dezelfde interactie — geen losse actie.** Een other course vertakt vanuit een stap in de primary course: het lopende proces wordt afgebroken (bijv. de gebruiker annuleert het opslaan) of neemt een afwijkende, geldige route die tot een ander resultaat leidt. Een op zichzelf staande actie die volledig los van de primary course wordt uitgevoerd is géén other course, maar een eigen use case. Schrijf elke other course als eigen blok met de heading `<omschrijving van het verloop> (other course)`, parallel aan de error-course-heading.
+  - Fout: bij "Bon uitstellen" een other course "Uitstellen ongedaan maken" met stappen "Gebruiker wist de datum en slaat op". → Dit is een zelfstandige actie die losstaat van het uitstellen, dus een eigen use case.
+  - Correct: other course `Opslaan annuleren (other course)` — de gebruiker breekt het invullen van de uitsteldatum af, waarna de bon ongewijzigd blijft.
+- **Zoeken, sorteren, filteren en pagineren zijn elk een eigen use case**, geen stap in de "overzicht bekijken"-use case. Een overzicht-use case beschrijft alleen het laden en tonen van de lijst (kolommen, sortering bij het laden, beschikbare rij-acties). Elke aanvullende interactie op die lijst krijgt een eigen use case met een eigen `Data`-sectie (alleen de velden die voor díe interactie relevant zijn).
+  - Fout: use case "Contactpersonen overzicht bekijken" met primary-course-stappen "Gebruiker kan zoeken op naam en e-mailadres" en "Gebruiker kan sorteren op naam".
+  - Correct: drie use cases — "Contactpersonen overzicht bekijken" (laden + tonen), "Contactpersonen zoeken" (Data: `naam`, `email`) en "Contactpersonen sorteren" (Data: `naam`).
 
 ### Stap 5 — Gerichte vervolgvragen per use case
 
@@ -191,7 +234,7 @@ Stel alleen relevante vragen. Stop als je genoeg weet om de use case volledig te
 
 ### Stap 6 — Wie is de gebruiker?
 
-- Als er actoren beschikbaar zijn uit `specs/actors.md`: presenteer als genummerde lijst + "Voeg nieuwe actor toe"
+- Als er actoren beschikbaar zijn uit `docs/specs/actors.md`: presenteer als genummerde lijst + "Voeg nieuwe actor toe"
 - Anders: vrije tekst
 
 ### Stap 7 — Rollen & rechten
@@ -215,16 +258,30 @@ Bouw voort op de codebase-kennis die je al hebt opgedaan in Stap 4. Doorzoek aan
 
 **Bestaande specs:** Als er raakvlakken zijn, benoem ze:
 
-> "Ik zie dat dit raakvlakken heeft met `specs/features/projecten.md`. Wil je dat ik dit meeneem?"
+> "Ik zie dat dit raakvlakken heeft met `docs/specs/project-management/create-project.md`. Wil je dat ik dit meeneem?"
 
 **Getroffen use cases bevestigen (alleen bij bug of improvement):** Als je in Stap 4 getroffen use cases hebt verzameld, presenteer ze als lijst en vraag bevestiging:
 
 > "De volgende use cases worden geraakt door deze [bug/improvement]:
-> - `specs/features/<bestand>.md` → **<naam use case>**
+> - `docs/specs/<domein>/<story>.md` → **<naam use case>**
 >
 > Kloppen deze? Mis je er één, of wil je er één verwijderen?"
 
-Pas de lijst aan op basis van het antwoord. Sla de definitieve lijst op voor gebruik bij het bijwerken van de use cases na het opslaan van de template. Als er geen getroffen use cases zijn gevonden, sla deze stap over.
+Pas de lijst aan op basis van het antwoord. Sla de definitieve lijst op voor gebruik bij het bijwerken van de use cases na het opslaan van de template.
+
+**Geraakte items markeren (bij bug of improvement):** Een bug of improvement verwijst altijd naar een bestaande story. Bepaal welke story het gedrag beschrijft en welke concrete items (narratives, scenario's, use cases) geraakt worden.
+
+- **Story bestaat** → noteer het story-pad en de exacte items die gemarkeerd moeten worden (kopteksten, zodat je er later anchor-links naar kunt maken).
+- **Geen story/use case voor dit gedrag** → meld dat en stel voor die eerst vast te leggen:
+
+  > "Er is nog geen story die dit gedrag beschrijft. Ik leg die eerst vast in `docs/specs/<domein>/<story>.md` (volgens de feature-template) en markeer daar de [bug/improvement]. Akkoord?"
+
+  - "ja" → maak het story-bestand aan (of vul het aan) met de use case/scenario's die het beoogde gedrag beschrijven.
+  - "nee" → gebruik een placeholder `docs/specs/<nader-te-bepalen>.md` als referentie.
+
+Sla de definitieve lijst van geraakte items op. Deze gebruik je voor de `Referenties`-sectie in het bug-/improvement-bestand én voor het plaatsen van de overlay in de story (zie "Bug-overlay in de story" / "Improvement-overlay in de story" en de afrondingsstap).
+
+Als er geen getroffen use cases zijn gevonden en het type geen bug is, sla deze stap over.
 
 **Side effects:** Zoek naar:
 - Expliciete relaties van betrokken modellen (associations, foreign keys, belongs_to, has_many, etc.)
@@ -270,53 +327,73 @@ Gebruik alle verzamelde informatie om de template volledig in te vullen. Leid ha
 - "nee" → laat het weg en ga verder met de standaard template
 
 Sla op in de juiste submap:
-- Feature → `specs/features/<english-kebab-case-domain>.md`
-- Bug → `specs/bugs/<kebab-case-titel>.md`
-- Improvement → `specs/improvements/<kebab-case-titel>.md`
+- Feature → `docs/specs/<english-kebab-case-domain>/<english-kebab-case-story>.md`
+- Bug → `docs/specs/bugs/<kebab-case-titel>.md`
+- Improvement → `docs/specs/improvements/<kebab-case-titel>.md`
 
-**Voor features:** bepaal eerst tot welk domein de use case behoort en kijk of er al een bestand voor dat domein bestaat in `specs/features/`. Als dat zo is, voeg de nieuwe Narrative + Scenarios toe aan de Stories-sectie en de Use Case aan de Use Cases-sectie van dat bestaande bestand. Als er nog geen domeinbestand bestaat, maak een nieuw bestand aan met de Engelstalige domeinnaam en voeg de H1-kop `# <Domain Name> Feature Specs` toe als eerste regel.
+**Voor features:** bepaal eerst tot welk domein (map) de story behoort en kijk of er al een bestand voor díe story bestaat in `docs/specs/<domein>/`. Als dat zo is, voeg de nieuwe Narrative + Scenarios toe aan de Narratives-sectie en de Use Case aan de Use cases-sectie van dat bestaande bestand. Als er nog geen bestand voor de story bestaat, maak een nieuw bestand aan in de domeinmap met de Engelstalige story-naam en voeg de H1-kop `# <Story Titel>` toe als eerste regel.
 
 ### Feature output format:
 
 ```markdown
-## Stories
+# <Story Titel>
 
-### Narrative #<n>
+## <Specs voor feature>
+
+### Story: <in het kort de story>
+
+### Narratives
+
+#### Narrative #<n>
 
 ```
 Als <actor>
 Wil ik <actie/functionaliteit>
-Zodat ik <doel/waarde>
+Zodat ik <bedrijfsdoel/waarde>
 ```
 
-#### Scenarios (Acceptance criteria)
+##### Scenarios / acceptatie criteria
 
 ```
-Given <preconditie>
- When <actie>
- Then <verwacht resultaat>
-  And <aanvullend resultaat>
+Gegeven <preconditie>
+ Wanneer <actie>
+ Dan <verwacht resultaat>
+  En <aanvullend resultaat>
 ```
+
+_(Rollen & permissies beschrijf je hier ín de scenario's — bijv. `Gegeven een gebruiker met rol <rol of `<bedenk de rolnaam>`>` of `Dan krijgt een gebruiker zonder de permissie <permissie of `<bedenk de naam voor de permissie>`> een foutmelding`. Maak hiervoor géén aparte sectie.)_
 
 _(herhaal Narrative + Scenarios per scenario-groep)_
 
-## Rollen & Permissies
+### Relevante bestanden
 
-_(Laat deze sectie weg als er geen rollen of permissies van toepassing zijn.)_
+_(Bestanden die direct gerelateerd zijn aan deze story, afgeleid uit de codebase-analyse. Gebruik dit als startpunt bij codebase-navigatie.)_
 
-- Rol: <rolnaam of `<bedenk de rolnaam>`>
-- Permissies:
-  - <permissienaam of `<bedenk de naam voor de permissie>`>
+| Pad | Type |
+|-----|------|
+| `<pad>` | `<type>` |
 
-## Use Cases
+## Use cases
 
 ### <Naam Use Case>
 
 #### Data:
-_(Alleen verplichte velden en optionele velden die het verloop beïnvloeden — bijv. door een conditional course te triggeren. Puur optionele invulvelden weglaten. Gebruik altijd de technische modelnaam met relevante scope of attribuut, bijv. `Assignment (type: draw)` of `User (role: field_worker)` — nooit een functionele omschrijving zoals "Tekentaak" of "Buitendienstmedewerker".)_
-- <Modelnaam (attribuut: waarde)>
+_(Alleen verplichte velden en optionele velden die het verloop beïnvloeden — bijv. door een conditional course te triggeren. Puur optionele invulvelden weglaten. Gebruik technische attribuut- en modelnamen in code-notatie — nooit een functionele omschrijving zoals "Tekentaak" of "Buitendienstmedewerker". Type- en constraint-details (verplicht/optioneel, decimal, enz.) horen in `Formuliervelden` en `Model Specs`, niet hier. Bepaalt een specifieke scope/waarde het verloop, noteer die bij het attribuut, bijv. `type: draw`.)_
+
+_(Gaat het om **één model**, lijst dan alleen de attribuutnamen plat op — herhaal de modelnaam niet per regel:)_
+- `<attribuut>`
+
+_(Zijn er **meerdere modellen** betrokken, groepeer de attributen dan genest onder elke modelnaam:)_
+- `<Modelnaam>`
+  - `<attribuut>`
+- `<Modelnaam>`
+  - `<attribuut>`
 
 #### Primary course (happy path):
+1. <stap>
+
+#### <afwijkend verloop> (other course):
+_(Een alternatief, niet-foutief verloop dat vanuit de primary course vertakt — bijv. het annuleren of afbreken van het lopende proces, of een afwijkende geldige keuze. Eén heading per other course, parallel aan de error course. Géén op zichzelf staande actie — die wordt een eigen use case. Laat weg als er geen other courses zijn.)_
 1. <stap>
 
 #### <fout> – error course (sad path):
@@ -324,19 +401,7 @@ _(Alleen verplichte velden en optionele velden die het verloop beïnvloeden — 
 
 ---
 
-_(herhaal per use case, gescheiden door ---)_
-
-## Formuliervelden
-
-_(Alleen opnemen als het domein een of meer formulieren bevat. Documenteer alle velden van het formulier, inclusief optionele. Laat de sectie weg als er geen formulieren zijn.)_
-
-_(Gebruik voor **Type** altijd technische typeaanduidingen: `string`, `integer`, `float`, `boolean`, `time`, `date`, `datetime`, `enum(waarde1, waarde2)`, `text`. Gebruik voor **Opties** een kommagescheiden opsomming van van toepassing zijnde constraints: `verplicht`, `disabled`, `readonly`, `hidden` — leeg laten als er geen constraints zijn. Gebruik voor **Autorisatie** de notatie `view: <rollen/permissies>` en/of `edit: <rollen/permissies>` — leeg laten als iedereen toegang heeft.)_
-
-### <Formuliernaam>
-
-| Veld | Type | Standaard | Opties | Autorisatie | Toelichting | Afhankelijkheden |
-|------|------|-----------|--------|-------------|-------------|-----------------|
-| `<veldnaam>` | `<type>` | <standaardwaarde of leeg> | <verplicht, disabled, ...> | <view: rol1, rol2 / edit: rol1> | <korte uitleg wat het veld doet of waar het invloed op heeft> | <conditionele relaties met andere velden, bijv. "Als [waarde], dan is [veld] zichtbaar / verplicht / uitgeschakeld" — leeg laten als er geen afhankelijkheden zijn> |
+_(herhaal per use case — sluit elke use case af met een `---` divider)_
 
 ## Model Specs
 
@@ -350,7 +415,19 @@ _(Neem hier ook gestructureerde datavormen op die niet door een class worden ged
 |----------|------|
 | `<property>` | `<type>` |
 
-### Payload contract
+### Formuliervelden
+
+_(Alleen opnemen als deze story een of meer formulieren bevat. Documenteer alle velden van het formulier, inclusief optionele. Laat dit weg als er geen formulieren zijn.)_
+
+_(Gebruik voor **Type** altijd technische typeaanduidingen: `string`, `integer`, `float`, `boolean`, `time`, `date`, `datetime`, `enum(waarde1, waarde2)`, `text`. Gebruik voor **Opties** een kommagescheiden opsomming van van toepassing zijnde constraints: `verplicht`, `disabled`, `readonly`, `hidden` — leeg laten als er geen constraints zijn. Gebruik voor **Autorisatie** de notatie `view: <rollen/permissies>` en/of `edit: <rollen/permissies>` — leeg laten als iedereen toegang heeft.)_
+
+#### <Formuliernaam>
+
+| Veld | Type | Standaard | Opties | Autorisatie | Toelichting | Afhankelijkheden |
+|------|------|-----------|--------|-------------|-------------|-----------------|
+| `<veldnaam>` | `<type>` | <standaardwaarde of leeg> | <verplicht, disabled, ...> | <view: rol1, rol2 / edit: rol1> | <korte uitleg wat het veld doet of waar het invloed op heeft> | <conditionele relaties met andere velden, bijv. "Als [waarde], dan is [veld] zichtbaar / verplicht / uitgeschakeld" — leeg laten als er geen afhankelijkheden zijn> |
+
+### Bijbehorende payload contract (indien API)
 
 _(Alleen opnemen als het project een API is.)_
 
@@ -364,14 +441,6 @@ _(Alleen opnemen als het project een API is.)_
 }
 ```
 
-## Relevante bestanden
-
-_(Bestanden die direct gerelateerd zijn aan dit domein, afgeleid uit de codebase-analyse. Gebruik dit als startpunt bij codebase-navigatie.)_
-
-| Pad | Type |
-|-----|------|
-| `<pad>` | `<type>` |
-
 ---
 
 /label ~"workflow::Service Desk"
@@ -381,11 +450,15 @@ _(Bestanden die direct gerelateerd zijn aan dit domein, afgeleid uit de codebase
 ### Bug output format:
 
 ```markdown
-## Getroffen use cases
+## Referenties
 
-_(Use cases in de specs die door deze bug worden geraakt.)_
+_(Kort navigatie-overzicht: link naar de story en deep-links naar de gemarkeerde items. Anchors verwijzen naar de koppen (H1–H4) in de story, zodat je er direct heen kunt klikken. De inhoudelijke huidige en verwachte situatie staan als overlay bij deze items in de story zelf.)_
 
-- [`specs/features/<bestand>.md`] → <naam use case>
+Story: [`<story>.md`](docs/specs/<domein>/<story>.md)
+
+Gemarkeerde items:
+- [<kop — bijv. Narrative #1 / Scenario / Use case-naam>](docs/specs/<domein>/<story>.md#<anchor>)
+- ...
 
 ## Data
 
@@ -395,40 +468,58 @@ _(Use cases in de specs die door deze bug worden geraakt.)_
 - User: <naam/url/id>
 - <overige relevante data>
 
-## Huidige situatie (reproductie)
+## Reproductie
 
-```
-GIVEN <beginsituatie>
-WHEN  <actie van de gebruiker>
-THEN  <huidig (foutief) gedrag van het systeem>
-```
-
-## Verwachte situatie (acceptatie criteria)
-
-- [ ] Scenario 1
-
-```
-GIVEN <beginsituatie>
-WHEN  <actie van de gebruiker>
-THEN  <verwacht correct gedrag>
-```
+1. <stap>
+2. <stap>
 
 /label ~"workflow::Service Desk"
 /label ~"type::bug"
 ```
 
+### Bug-overlay in de story
+
+De inhoudelijke huidige en verwachte situatie van een bug leg je **niet** in het bug-bestand vast, maar als **overlay in de betrokken `docs/specs/<domein>/<story>.md`**. Zo blijft alle documentatie van een story op één plek. De `<bug-slug>` is gelijk aan de bestandsnaam van het bug-bestand zonder `.md`.
+
+**1. Banner bovenaan de story** (direct onder de H1), één regel per open bug:
+
+```markdown
+> 🐛 **Open bug:** `<bug-slug>` — gemarkeerde items hieronder wijken af van de implementatie. Zie [`docs/specs/bugs/<bug-slug>.md`].
+```
+
+**2. Overlay per geraakt item** (narrative, scenario of use case), direct onder de kop/het blok van dat item. Huidige én verwachte situatie staan in hetzelfde blok en zijn via dezelfde `<bug-slug>` gekoppeld:
+
+```markdown
+> ⚠️ **Bug `<bug-slug>`** — dit item wijkt af van de implementatie.
+>
+> **Huidig (foutief) gedrag:**
+>
+> Gegeven <preconditie>
+>  Wanneer <actie>
+>  Dan <wat er nu fout gaat>
+>
+> **Verwacht (na fix):**
+>
+> Gegeven <preconditie>
+>  Wanneer <actie>
+>  Dan <correct gedrag>
+```
+
+Markeer elk geraakt item dat de gebruiker in Stap 8 heeft bevestigd. De oorspronkelijke scenario-tekst van de story blijft staan — de overlay komt erbij, niet in de plaats. Bij het oplossen van de bug ruimt `/specs:verify` de overlay weer op en blijft alleen de actuele documentatie over.
+
 ### Improvement output format:
 
 ```markdown
-## Story
+## Referenties
+
+_(Kort navigatie-overzicht: link naar de story en deep-links naar de gemarkeerde items. Anchors verwijzen naar de koppen (H1–H4) in de story, zodat je er direct heen kunt klikken. De huidige werking en de gewenste verbetering staan als overlay bij deze items in de story zelf.)_
 
 Issue: #<nummer of leeg laten>
+Story: [`<story>.md`](docs/specs/<domein>/<story>.md)
 
-## Getroffen use cases
-
-_(Use cases in de specs die door deze improvement worden geraakt.)_
-
-- [`specs/features/<bestand>.md`] → <naam use case>
+Gemarkeerde items:
+- [<kop — bijv. Narrative #1 / Scenario / Use case-naam>](docs/specs/<domein>/<story>.md#<anchor>)
+- ...
 
 ## Type verbetering
 
@@ -436,25 +527,39 @@ _(Use cases in de specs die door deze improvement worden geraakt.)_
 - [x/space] Verbetering voor eindgebruiker
 - [x/space] Verbetering voor developers
 
-## Huidige situatie
-
-<beschrijving van de huidige situatie of bottleneck>
-
-## Verbetering
-
-<beschrijving van de gewenste verbetering>
-
-- [ ] Scenario 1
-
-```
-GIVEN <precondities>
-WHEN  <actie>
-THEN  <verwacht resultaat na verbetering>
-```
-
 /label ~"workflow::Service Desk"
 /label ~"type::Improvement"
 ```
+
+### Improvement-overlay in de story
+
+Net als bij een bug leg je de inhoudelijke huidige werking en gewenste verbetering **niet** in het improvement-bestand vast, maar als **overlay in de betrokken `docs/specs/<domein>/<story>.md`**. Zo blijft alle documentatie van een story op één plek. De `<imp-slug>` is gelijk aan de bestandsnaam van het improvement-bestand zonder `.md`.
+
+**1. Banner bovenaan de story** (direct onder de H1), één regel per open improvement:
+
+```markdown
+> 💡 **Open improvement:** `<imp-slug>` — gemarkeerde items hieronder worden gewijzigd. Zie [`docs/specs/improvements/<imp-slug>.md`].
+```
+
+**2. Overlay per geraakt item** (narrative, scenario of use case), direct onder de kop/het blok van dat item. Huidige werking én gewenste verbetering staan in hetzelfde blok en zijn via dezelfde `<imp-slug>` gekoppeld:
+
+```markdown
+> ✏️ **Improvement `<imp-slug>`** — voor dit item is een wijziging gewenst.
+>
+> **Huidige werking** (correct, maar ongewenst):
+>
+> Gegeven <preconditie>
+>  Wanneer <actie>
+>  Dan <huidige werking>
+>
+> **Gewenste verbetering:**
+>
+> Gegeven <preconditie>
+>  Wanneer <actie>
+>  Dan <gewenste werking na verbetering>
+```
+
+Markeer elk geraakt item dat de gebruiker in Stap 8 heeft bevestigd. De oorspronkelijke scenario-tekst van de story blijft staan — de overlay komt erbij, niet in de plaats. Zo blijft de story de actuele werking beschrijven tot de verbetering daadwerkelijk is doorgevoerd. Bij het doorvoeren ruimt `/specs:verify` de overlay op en wordt de gewenste verbetering de nieuwe actuele documentatie.
 
 ---
 
@@ -466,31 +571,32 @@ Na het presenteren van de ingevulde template, vraag:
 
 Herhaal totdat de gebruiker tevreden is. Sla de definitieve versie op en bevestig het bestandspad.
 
-**Use cases bijwerken (alleen bij bug of improvement):** Nadat de template is opgeslagen en bevestigd, en er getroffen use cases zijn vastgesteld, vraag:
+**Story bijwerken (alleen bij bug of improvement):** Nadat de template is opgeslagen en bevestigd, en er getroffen items zijn vastgesteld, vraag:
 
-> "Wil je de getroffen use cases bijwerken?"
+> "Wil je de story bijwerken (de bug erin markeren / de improvement-scenario's aanpassen)?"
 
 - "ja" → voer de bijwerking uit per type:
-  - **Bug** → Voeg direct onder de koptekst van elke getroffen use case een annotatie toe:
-    ```
-    > ⚠️ Afwijking: zie [`specs/bugs/<bestandsnaam>.md`] voor details.
-    ```
-    Wijzig de bestaande scenario's **niet** — de spec beschrijft nog altijd het gewenste correcte gedrag.
-  - **Improvement** → Pas de scenario's van de getroffen use case aan zodat ze het verbeterde gewenste gedrag beschrijven. Verwijder of vervang scenario's die het oude gedrag beschrijven. Voeg direct onder de koptekst van de use case een annotatie toe:
-    ```
-    > ℹ️ Aangepast via [`specs/improvements/<bestandsnaam>.md`].
-    ```
+  - **Bug** → Markeer de geraakte items in de story volgens "Bug-overlay in de story":
+    1. Voeg de banner toe direct onder de H1 van de story (één regel per open bug, met de `<bug-slug>`).
+    2. Plaats bij elk bevestigd geraakt item (narrative/scenario/use case) een overlay met het **Huidig (foutief) gedrag** en de **Verwacht (na fix)**-situatie, gekoppeld via dezelfde `<bug-slug>`.
+
+    Wijzig de bestaande scenario-tekst van de story **niet** — de overlay komt erbij. Werk daarna de `Referenties`-sectie van het bug-bestand bij met anchor-links naar de gemarkeerde koppen.
+  - **Improvement** → Markeer de geraakte items in de story volgens "Improvement-overlay in de story":
+    1. Voeg de banner toe direct onder de H1 van de story (één regel per open improvement, met de `<imp-slug>`).
+    2. Plaats bij elk bevestigd geraakt item (narrative/scenario/use case) een overlay met de **Huidige werking** en de **Gewenste verbetering**, gekoppeld via dezelfde `<imp-slug>`.
+
+    Wijzig de bestaande scenario-tekst van de story **niet** — de story beschrijft de actuele werking tot de verbetering is doorgevoerd; de overlay komt erbij. Werk daarna de `Referenties`-sectie van het improvement-bestand bij met anchor-links naar de gemarkeerde koppen.
   Bevestig na het opslaan welke bestanden zijn bijgewerkt.
 - "nee" → sla over
 
-Sla deze stap volledig over als er geen getroffen use cases zijn vastgesteld.
+Sla deze stap volledig over als er geen getroffen items zijn vastgesteld.
 
 **Verouderde specs rapporteren:** Als je tijdens de codebase-analyse afwijkingen hebt verzameld tussen bestaande spec-bestanden en de huidige implementatie, presenteer deze daarna als aparte feedback — nadat de template is opgeslagen en bevestigd. Gebruik dit formaat:
 
 ```
 Let op: de volgende bestaande beschrijvingen komen niet meer overeen met de huidige codebase.
 
-📄 specs/features/<bestandsnaam>.md
+📄 docs/specs/<domein>/<story>.md
   - <sectie of use case>: <korte beschrijving van de afwijking>
   - ...
 

@@ -1,8 +1,8 @@
 ---
-description: Genereert geautomatiseerde tests uit de Given/When/Then-scenario's van een feature-, bug- of improvement-spec, één test per scenario, volgens de test-conventies die al in de codebase aanwezig zijn
+description: Genereert geautomatiseerde tests uit de Gegeven/Wanneer/Dan-scenario's van een feature-, bug- of improvement-spec, één test per scenario, volgens de test-conventies die al in de codebase aanwezig zijn
 ---
 
-Je bent een test-engineer die de acceptatie-scenario's uit een spec omzet naar geautomatiseerde tests. De scenario's in de specs zijn bewust geschreven als één situatie per Given/When/Then-blok, zodat elk blok 1-op-1 naar één test vertaalt.
+Je bent een test-engineer die de acceptatie-scenario's uit een spec omzet naar geautomatiseerde tests. De scenario's in de specs zijn bewust geschreven als één situatie per Gegeven/Wanneer/Dan-blok, zodat elk blok 1-op-1 naar één test vertaalt. (Oudere specs kunnen nog de Engelse sleutelwoorden `Given`/`When`/`Then`/`And` gebruiken — behandel die als gelijkwaardig aan `Gegeven`/`Wanneer`/`Dan`/`En`.)
 
 Werk altijd in het Nederlands, ongeacht de taal waarin de gebruiker schrijft.
 
@@ -59,18 +59,18 @@ Als er nog geen tests zijn: kies de idiomatische standaard voor het framework en
 
 ## Stap 4 — Spec selecteren
 
-Lees de aanwezige specs in `specs/features/`, `specs/bugs/` en `specs/improvements/`.
+Lees de aanwezige specs in `docs/specs/<domein>/` (per-story bestanden), `docs/specs/bugs/` en `docs/specs/improvements/`.
 
 - **Geen specs gevonden** → stop en meld:
 
-  > "Er zijn geen specs gevonden in `specs/`. Draai eerst `/specs:intake` of `/specs:analyze` om scenario's vast te leggen, en kom daarna terug."
+  > "Er zijn geen specs gevonden in `docs/specs/`. Draai eerst `/specs:intake` of `/specs:analyze` om scenario's vast te leggen, en kom daarna terug."
 
 Bepaal welke spec getest moet worden:
 
 1. **Argument meegegeven** (bijv. `/specs:test user-management`) → match op bestandsnaam.
 2. **Anders, leid een kandidaat af uit de context:** de actieve branchnaam en de bestanden uit `git diff origin/development` (indien beschikbaar) die overlappen met de `Relevante bestanden`-sectie van een spec. Presenteer en vraag bevestiging:
 
-   > "Op basis van je branch en wijzigingen lijkt dit te gaan om `specs/<map>/<naam>.md` — *[titel]*. Tests hiervoor genereren?"
+   > "Op basis van je branch en wijzigingen lijkt dit te gaan om `docs/specs/<pad>/<naam>.md` — *[titel]*. Tests hiervoor genereren?"
 
 3. **Geen duidelijke kandidaat** → toon een genummerde lijst van alle specs en laat de gebruiker kiezen.
 
@@ -80,18 +80,18 @@ Bepaal welke spec getest moet worden:
 
 Haal uit de gekozen spec alle testbare scenario's:
 
-- **Feature** → elke Narrative met bijbehorende Scenarios (Given/When/Then) onder de Stories-sectie, plus de Primary/error courses uit de Use Cases.
-- **Bug** → de `Verwachte situatie (acceptatie criteria)`-blokken (het gewenste correcte gedrag ná de fix). Sla de `Huidige situatie (reproductie)` over — dat is het foutieve gedrag.
-- **Improvement** → de scenario-blokken onder `Verbetering` (de nieuwe gewenste werking).
+- **Feature** → elke Narrative met bijbehorende Scenarios (Gegeven/Wanneer/Dan) onder de Narratives-sectie, plus de Primary/other/error courses uit de Use cases.
+- **Bug** → volg de `Referenties` van het bug-bestand naar de story en lees per gemarkeerd item de bug-overlay: gebruik de **Verwacht (na fix)**-scenario's (het gewenste correcte gedrag ná de fix). Sla het **Huidig (foutief) gedrag** over — dat is het te repareren gedrag.
+- **Improvement** → volg de `Referenties` van het improvement-bestand naar de story en lees per gemarkeerd item de improvement-overlay: gebruik de **Gewenste verbetering**-scenario's (de nieuwe gewenste werking). Sla de **Huidige werking** over.
 
-Gebruik daarnaast de `Use Cases` (Data, Primary course, error courses), `Formuliervelden` (verplicht/optioneel, constraints, afhankelijkheden), `Rollen & Permissies` en `Model Specs` als context om realistische test-setup en assertions op te bouwen.
+Gebruik daarnaast de `Use cases` (Data, Primary course, other courses, error courses), de `Formuliervelden` en `Model Specs` (verplicht/optioneel, constraints, afhankelijkheden) en de rollen & permissies die in de scenario's beschreven staan als context om realistische test-setup en assertions op te bouwen.
 
 **Mapping-regels:**
 
-- **Eén Given/When/Then-blok → één test** (`it`/`test`/testmethode). Splits nooit één blok op en voeg nooit twee blokken samen.
+- **Eén Gegeven/Wanneer/Dan-blok → één test** (`it`/`test`/testmethode). Splits nooit één blok op en voeg nooit twee blokken samen.
 - **Elke Narrative → één groepering** (`describe`/`context`/testklasse), genoemd naar de actie + het object uit de "Wil ik"-regel.
-- **`And`-regels in Then → extra assertions** binnen dezelfde test.
-- **`And`-regels in Given → extra setup** binnen dezelfde test.
+- **`En`-regels in Dan → extra assertions** binnen dezelfde test.
+- **`En`-regels in Gegeven → extra setup** binnen dezelfde test.
 - **Rollen & permissies** → vertaal naar geauthenticeerde test-setup (`actingAs`, `sign_in`) en autorisatie-assertions (toegang toegestaan/geweigerd).
 - **Sad paths / error courses** → eigen test die de foutafhandeling controleert (validatiefout, geweigerde toegang, redirect, statuscode).
 
@@ -104,7 +104,7 @@ Schrijf de tests weg op de plek en in de stijl die je in Stap 3 hebt vastgesteld
 Richtlijnen:
 
 - **Plaats functionele/acceptatie-scenario's als feature- of integration-tests** (niet als unit-tests) — ze beschrijven gedrag van buitenaf, niet de interne implementatie.
-- **Eén testbestand per domein/spec**, met groeperingen per Narrative. Bestaat er al een testbestand voor dit domein, voeg dan ontbrekende tests toe — overschrijf bestaande tests niet.
+- **Eén testbestand per story/spec**, met groeperingen per Narrative. Bestaat er al een testbestand voor deze story, voeg dan ontbrekende tests toe — overschrijf bestaande tests niet.
 - **Gebruik de bestaande setup-helpers** (factories, seeders, fixtures). Verzin geen nieuwe als er al een patroon is.
 - **Geef tests een beschrijvende naam afgeleid uit het scenario**, in de testtaal-conventie (bijv. `it('wijst de dienst toe aan de medewerker')`).
 - **Markeer scenario's die je niet volledig kunt automatiseren** (bijv. omdat de bijbehorende code nog niet bestaat, of het scenario externe systemen vereist) met een gemarkeerde overgeslagen test (`pending`/`skip`/`xit`/`markTestSkipped`) plus een korte toelichting — zodat het scenario zichtbaar blijft maar de suite niet breekt.
@@ -132,7 +132,7 @@ Geef een beknopt overzicht:
 ```
 Tests gegenereerd.
 
-Spec:       specs/<map>/<naam>.md — <titel>
+Spec:       docs/specs/<pad>/<naam>.md — <titel>
 Framework:  <test-framework>
 Bestand(en):
   - <pad naar testbestand>  (+<n> tests)
